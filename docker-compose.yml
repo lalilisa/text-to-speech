@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ./results:/app/results
+  db:
+    image: mysql:latest
+    restart: always
+    container_name: mysqldb
+    environment:
+      MYSQL_ROOT_PASSWORD: trimai
+      MYSQL_DATABASE: base
+      MYSQL_USER: trimai
+      MYSQL_PASSWORD: trimai
+    ports:
+      - '3009:3306'
+    

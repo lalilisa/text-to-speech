@@ -1,0 +1,18 @@
+gdown
+# git+https://github.com/NTT123/vietTTS.git@demo
+gradio==3.0.2
+# haiku
+einops
+fire
+gdown
+jax
+jaxlib
+librosa
+optax
+mysql-connector-python
+tabulate
+textgrid @ git+https://github.com/kylebgorman/textgrid.git
+tqdm
+matplotlib
+#passlib[bcrypt]
+sqlalchemy
