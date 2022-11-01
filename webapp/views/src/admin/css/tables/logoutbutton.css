@@ -1,0 +1,27 @@
+.logoutbutton{
+
+    background-color: darkblue;
+    padding: 0.75rem;
+    color: white;
+    border-radius: 10px;
+}
+.logout{
+    float: right;
+    margin-right: 5%;
+    margin-top: 10px;
+}
+.user{
+    border-right: 2px solid black;
+    font-size: 1.25rem;
+    padding-right: 0.5rem;
+}
+.container-table100customize {
+    width: 100%;
+    min-height: 100vh;
+    background: #fff;
+    display: flex;
+    /* align-items: center; */
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 33px 30px;
+}
