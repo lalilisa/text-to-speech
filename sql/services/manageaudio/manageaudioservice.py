@@ -34,6 +34,4 @@ def upadte_record(db:Session,id:int,updateRecord:schemas.UpdateAudioGenerated):
         db.refresh(record_audio)
         return db.get(models.ManageAudioGenerated,id)
 
-def get_record_by_hash_code(db:Session,hashCode:str):
-        record=db.query(models.ManageAudioGenerated).filter(models.ManageAudioGenerated.hashcode == hashCode).first()
-        return record
+

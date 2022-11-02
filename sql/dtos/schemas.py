@@ -9,18 +9,15 @@ class CreateAccountDto(BaseModel):
 
 
 class AudioGenerated(BaseModel):
-    hashcode: str
     inputText: str
-    audioNameOutput: str
     words: int
     isGenPath:bool
     outputPathAudio:str 
 
 
 class UpdateAudioGenerated(BaseModel):
-    hashcode: str
+
     inputText: str
-    audioNameOutput: str
     words: int
     isGenPath:bool
     outputPathAudio:str 

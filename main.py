@@ -12,9 +12,9 @@ import os
 from starlette.responses import StreamingResponse
 import soundfile as sf
 import hashlib
-from typing import Union
+from typing import List, Union
 import uvicorn
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, UploadFile
 from pydantic import BaseModel
 from sql.services.manageaudio import manageaudioservice 
 
@@ -46,7 +46,13 @@ def nat_normalize_text(text):
 
 def get_hash(text):
   return hashlib.md5(text.encode()).hexdigest()
-
+#get db
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 def text_to_speech(text: str):
   if (text == ""):
@@ -65,6 +71,7 @@ def text_to_speech(text: str):
   return (wave * (2**15)).astype(np.int16)
 
 
+
 def speak(text: str):
   text = nat_normalize_text(text)
   # check path if not exist, create new file
@@ -73,8 +80,8 @@ def speak(text: str):
   # check file
   hash = get_hash(text)
   file_path = os.path.join(RESULT_PATH, hash + ".wav")
-  # if os.path.exists(file_path):
-  #   return file_path
+  if os.path.exists(file_path):
+    return file_path
 
   # make file
   file = open(file_path, "w+")
@@ -108,12 +115,6 @@ app.add_middleware(
 @app.get("/")
 def read_root():
   return {"Hello": "World"}
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @app.get("/audio")
 async def read_record(db: Session = Depends(get_db)):
@@ -123,22 +124,13 @@ async def udpate_record(id:int,updateRecord:schemas.UpdateAudioGenerated,db: Ses
   return manageaudioservice.upadte_record(db,id,updateRecord)
 @app.post("/audio")
 async def save_record(body: TextInput,db: Session = Depends(get_db)):
+    speak(body.text)
 
-    hashCode=get_hash(body.text)
-    checkExistedRecord=manageaudioservice.get_record_by_hash_code(db,hashCode)
-    audioName=hashCode+".wav"
-    audioPath=os.path.join(RESULT_PATH, audioName)
-    if checkExistedRecord is not None:
-          if os.path.exists(audioPath):
-            return {"file":audioName}
-    audioByTTS=speak(body.text)
     numberWords=len(nat_normalize_text(body.text).split(" "))
-    audioSchemas=schemas.AudioGenerated(hashcode=hashCode,inputText=body.text,audioNameOutput=audioName,words=numberWords,isGenPath=False,outputPathAudio=audioPath)
-    #save to db
-    print("-----------------------------------")
-    manageaudioservice.create_record_audio(db,audioSchemas)
-    # return path
-    return {"file": audioByTTS}
+    audioSchema=schemas.AudioGenerated(inputText=nat_normalize_text(body.text),words=numberWords,isGenPath=True,outputPathAudio=RESULT_PATH+"/"+get_hash(nat_normalize_text(body.text)))
+    manageaudioservice.create_record_audio(db,audioSchema)
+      # return path
+    return {"file": get_hash(body.text)+".wav"}
 
 
 @app.delete("/audio/{id}")
@@ -156,9 +148,15 @@ async def read_item(path: str):
   return StreamingResponse(open(os.path.join(RESULT_PATH, path), "rb"), media_type="audio/wav")
 
 
+@app.post("/uploadfiles/")
+async def create_upload_files(files: List[UploadFile]):
+    return {"filenames": [file.filename for file in files]}
 title = "Chuyển văn bản thành giọng nói"
 
+
+
 gr_io = gr.Interface(
+    
     fn=speak,
     inputs="text",
     outputs="audio",

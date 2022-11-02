@@ -18,12 +18,10 @@ class Account(Base):
 class ManageAudioGenerated(Base):
     __tablename__="manager_audio_generated"
     id = Column(Integer, primary_key=True, index=True)
-    hashcode=Column(String(255),unique=True,index=True)
-    inputText=Column(String(255),unique=True,index=True)
-    audioNameOutput=Column(String(255),unique=True,index=True)
+    inputText=Column(String(255),index=True)
     words=Column(Integer)
     isGenPath=Column(Boolean,default=True)
-    outputPathAudio=Column(String(255),unique=True,index=True)
+    outputPathAudio=Column(String(255))
 
 
 
